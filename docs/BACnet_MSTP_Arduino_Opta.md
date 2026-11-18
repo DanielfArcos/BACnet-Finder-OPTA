@@ -1,6 +1,6 @@
-# Documentação Técnica: BACnet MS/TP (RS-485) no Arduino Opta WiFi
+# Documentação Técnica: BACnet MS/TP (RS-485) no Finder OPTA WiFi
 
-Este documento descreve a arquitetura, a ligação física RS-485, as **alterações técnicas realizadas nas bibliotecas**, a implementação dos *callbacks* de transporte e o guia completo de conexão e solução de problemas do **Arduino Opta WiFi** operando em **BACnet MS/TP (RS-485)** com o software cliente **YABE (Yet Another BACnet Explorer)**.
+Este documento descreve a arquitetura, a ligação física RS-485, as **alterações técnicas realizadas nas bibliotecas**, a implementação dos *callbacks* de transporte e o guia completo de conexão e solução de problemas do **Finder OPTA WiFi** operando em **BACnet MS/TP (RS-485)** com o software cliente **YABE (Yet Another BACnet Explorer)**.
 
 ---
 
@@ -8,7 +8,7 @@ Este documento descreve a arquitetura, a ligação física RS-485, as **alteraç
 
 1. [Visão Geral e Arquitetura BACnet MS/TP](#1-visão-geral-e-arquitetura-bacnet-mstp)
 2. [Bibliotecas Utilizadas e Alterações Realizadas](#2-bibliotecas-utilizadas-e-alterações-realizadas)
-3. [Ligação Física RS-485 (PC ↔ Arduino Opta)](#3-ligação-física-rs-485-pc--arduino-opta)
+3. [Ligação Física RS-485 (PC ↔ Finder OPTA)](#3-ligação-física-rs-485-pc--finder-opta)
 4. [Callbacks de Transporte e Temporização RS-485](#4-callbacks-de-transporte-e-temporização-rs-485)
 5. [Mapeamento de Hardware e Objetos BACnet](#5-mapeamento-de-hardware-e-objetos-bacnet)
 6. [Guia Passo a Passo de Conexão no YABE](#6-guia-passo-a-passo-de-conexão-no-yabe)
@@ -26,7 +26,7 @@ O **BACnet MS/TP (*Master-Slave / Token-Passing* — Cláusula 9 da norma ASHRAE
 * **Endereçamento MAC MS/TP vs. Device Instance**:
   - **MAC Address MS/TP (`1 byte`, `0..127` para mestres)**: endereço físico local no barramento RS-485. No nosso projeto:
     - **YABE (PC)**: `MAC = 0` (`Source Address = 0`)
-    - **Arduino Opta**: `MAC = 1` (`MSTP_UNIT_MAC = 1`)
+    - **Finder OPTA**: `MAC = 1` (`MSTP_UNIT_MAC = 1`)
   - **BACnet Device Instance (`0..4194302`)**: identificador lógico único do controlador no sistema BACnet. No nosso projeto MS/TP: **`DEVICE:2002`** (`Opta_MSTP_BACnet`).
 
 ```mermaid
@@ -37,7 +37,7 @@ flowchart LR
         YABE <--> USB485
     end
 
-    subgraph OPTA["Arduino Opta WiFi (Servidor / Mestre MS/TP)"]
+    subgraph OPTA["Finder OPTA WiFi (Servidor / Mestre MS/TP)"]
         RS485PORT["Transceptor RS-485 Nativo\nUART2 (PB_10/PB_11) + DE (PB_14)"]
         MSTPSTACK["Pilha BACnet-Arduino MS/TP\nMAC = 1 | Max Master = 10\nDEVICE:2002 (Opta_MSTP_BACnet)"]
         IO["Hardware Físico\nRelés D0..D3 | LEDs\nBTN_USER | Entradas I1..I8"]
@@ -53,7 +53,7 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     participant YABE as YABE (Mestre MAC 0)
-    participant OPTA as Arduino Opta (Mestre MAC 1 / DEVICE:2002)
+    participant OPTA as Finder OPTA (Mestre MAC 1 / DEVICE:2002)
 
     YABE->>OPTA: Poll For Master (Procura próximo mestre no MAC 1)
     OPTA-->>YABE: Reply To Poll For Master (MAC 1 presente)
@@ -74,7 +74,7 @@ sequenceDiagram
 | :--- | :--- | :--- |
 | **`BACnet-Arduino`** | `0.7.0` *(configurada para MS/TP)* | Pilha BACnet com suporte a MS/TP (`BACnet-Arduino_MSTP.h` e `dlmstp`) |
 | **`WeeklyAlarm`** | `5.2.0` *(ajustada)* | Agendador semanal exigido por `Schedule.h` da `BACnet-Arduino` |
-| **`ArduinoRS485`** | `1.1.1` | Driver RS-485 oficial para controle do transceptor e pino `DE` do Arduino Opta |
+| **`ArduinoRS485`** | `1.1.1` | Driver RS-485 oficial para controle do transceptor e pino `DE` do Finder OPTA |
 | **`NTPClient`** | `3.2.1` | Dependência dos cabeçalhos da porta Arduino da `BACnet-Arduino` |
 
 ---
@@ -143,11 +143,11 @@ No sketch BACnet/IP, o cabeçalho `<Ethernet.h>` incluía indiretamente `<mbed_r
 
 ---
 
-## 3. Ligação Física RS-485 (PC ↔ Arduino Opta)
+## 3. Ligação Física RS-485 (PC ↔ Finder OPTA)
 
-Na parte inferior do **Arduino Opta WiFi**, localize o conector de 3 bornes identificado como **RS485**:
+Na parte inferior do **Finder OPTA WiFi**, localize o conector de 3 bornes identificado como **RS485**:
 
-| Borne no Arduino Opta | Terminal no Conversor USB-RS485 | Descrição do Sinal |
+| Borne no Finder OPTA | Terminal no Conversor USB-RS485 | Descrição do Sinal |
 | :---: | :---: | :--- |
 | **`A (-)`** | **`A`** (ou `D-` / `TR-`) | Linha diferencial inversora RS-485 |
 | **`B (+)`** | **`B`** (ou `D+` / `TR+`) | Linha diferencial não-inversora RS-485 |
@@ -155,7 +155,7 @@ Na parte inferior do **Arduino Opta WiFi**, localize o conector de 3 bornes iden
 
 > [!TIP]
 > **Inversão de polaridade A/B entre fabricantes:**
-> Enquanto a norma EIA-485 define `A` como negativo (`-`) e `B` como positivo (`+`) — padrão seguido pela serigrafia do Arduino Opta (`A(-)`, `B(+)`) —, diversos conversores USB-RS485 comerciais rotulam `A` como `+` e `B` como `-`. Se a porta COM abrir normalmente no YABE mas nenhum dispositivo aparecer na busca, inverta os dois fios `A` e `B` no conector do conversor. Inversão entre `A` e `B` não danifica o transceptor RS-485.
+> Enquanto a norma EIA-485 define `A` como negativo (`-`) e `B` como positivo (`+`) — padrão seguido pela serigrafia do Finder OPTA (`A(-)`, `B(+)`) —, diversos conversores USB-RS485 comerciais rotulam `A` como `+` e `B` como `-`. Se a porta COM abrir normalmente no YABE mas nenhum dispositivo aparecer na busca, inverta os dois fios `A` e `B` no conector do conversor. Inversão entre `A` e `B` não danifica o transceptor RS-485.
 
 ---
 
@@ -240,7 +240,7 @@ O sketch `Opta_BACnetMSTP_Test.ino` configura o dispositivo **`Opta_MSTP_BACnet`
 
 ## 6. Guia Passo a Passo de Conexão no YABE
 
-1. Grave o sketch `Opta_BACnetMSTP_Test.ino` no Arduino Opta.
+1. Grave o sketch `Opta_BACnetMSTP_Test.ino` no Finder OPTA.
 2. Abra o **YABE** e clique no botão **`+`** (*Add device / Start communication channel*).
 3. Na janela **BACnet Communication Channel**, localize o quadro **`BACnet/MSTP over serial`** (à direita) e preencha:
    - **`Port`**: selecione a porta `COM` do seu **conversor USB-RS485** (ex.: **`COM5`**). *Não selecione a porta COM do cabo USB-C do Opta (`COM4`).*
@@ -282,7 +282,7 @@ O Windows Update instala automaticamente o driver `wch.cn` **`CH341SER` versão 
 
 ## 8. Consumo de Memória e Troubleshooting Geral
 
-### 8.1. Recursos Utilizados no Arduino Opta
+### 8.1. Recursos Utilizados no Finder OPTA
 Resultado obtido na compilação limpa (`arduino-cli compile --fqbn arduino:mbed_opta:opta`):
 
 * **Memória Flash (Programa)**: `260.636 bytes` (**13%** do total de `1.966.080 bytes`)

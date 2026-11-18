@@ -1,5 +1,5 @@
 /*
- * Teste de Comunicacao BACnet MS/TP (RS-485) no Arduino Opta
+ * Teste de Comunicacao BACnet MS/TP (RS-485) no Finder OPTA
  *
  * Objetivo:
  *   Expor o Opta como Dispositivo Mestre BACnet MS/TP via porta RS-485 nativa
@@ -60,10 +60,10 @@ constexpr uint32_t RS485_POSTDELAY = (15UL * 1000000UL) / BACNET_MSTP_BAUD;
 const deviceInfos_t deviceInfos {
     2002,                                         // Device Instance (unico na rede)
     "Opta_MSTP_BACnet",                           // Object Name
-    "Arduino Opta WiFi BACnet MS/TP Test Server", // Description
+    "Finder OPTA WiFi BACnet MS/TP Test Server",  // Description
     "Bancada RS-485",                             // Location
-    "Arduino",                                    // Vendor Name
-    "Opta WiFi",                                  // Model Name
+    "Finder",                                     // Vendor Name
+    "Finder OPTA WiFi",                           // Model Name
     "1.0",                                        // Firmware Revision
     "0.1"                                         // Application Software Version
 };
@@ -75,7 +75,7 @@ const deviceInfos_t deviceInfos {
 constexpr time_t DEFAULT_EPOCH = 1794873600UL;
 
 // -----------------------------------------------------------------------------
-// Mapeamento de Hardware do Arduino Opta
+// Mapeamento de Hardware do Finder OPTA
 // -----------------------------------------------------------------------------
 struct RelayChannel {
     uint32_t instance;
@@ -313,7 +313,7 @@ void setup()
     while (!Serial && (millis() - startMs < 3000)) {
     }
 
-    Serial.println("\n=== Arduino Opta WiFi - Teste BACnet MS/TP (RS-485) ===");
+    Serial.println("\n=== Finder OPTA WiFi - Teste BACnet MS/TP (RS-485) ===");
     setupHardware();
     setupRS485();
     setupBacnetMSTP();

@@ -1,6 +1,6 @@
-# BACnet no Arduino Opta WiFi (BACnet/IP & BACnet MS/TP)
+# BACnet no Finder OPTA WiFi (BACnet/IP & BACnet MS/TP)
 
-Repositório completo de integração, testes e documentação prática do protocolo **BACnet (ASHRAE 135)** no CLP industrial **Arduino Opta WiFi (STM32H747)** utilizando a biblioteca `BACnet-Arduino` e o cliente de engenharia **YABE (Yet Another BACnet Explorer)**.
+Repositório completo de integração, testes e documentação prática do protocolo **BACnet (ASHRAE 135)** no CLP industrial **Finder OPTA WiFi (STM32H747)** utilizando a biblioteca `BACnet-Arduino` e o cliente de engenharia **YABE (Yet Another BACnet Explorer)**.
 
 ---
 

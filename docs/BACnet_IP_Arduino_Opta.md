@@ -1,6 +1,6 @@
-# Documentação Técnica: BACnet/IP no Arduino Opta WiFi
+# Documentação Técnica: BACnet/IP no Finder OPTA WiFi
 
-Este documento descreve a arquitetura, as bibliotecas, as **alterações técnicas realizadas nas dependências**, o mapeamento de hardware e o procedimento completo de comissionamento do **Arduino Opta WiFi** operando como **Servidor BACnet/IP (Ethernet)** utilizando a biblioteca `BACnet-Arduino` e o software cliente **YABE (Yet Another BACnet Explorer)**.
+Este documento descreve a arquitetura, as bibliotecas, as **alterações técnicas realizadas nas dependências**, o mapeamento de hardware e o procedimento completo de comissionamento do **Finder OPTA WiFi** operando como **Servidor BACnet/IP (Ethernet)** utilizando a biblioteca `BACnet-Arduino` e o software cliente **YABE (Yet Another BACnet Explorer)**.
 
 ---
 
@@ -21,7 +21,7 @@ Este documento descreve a arquitetura, as bibliotecas, as **alterações técnic
 
 No protocolo **BACnet (ASHRAE 135 / ISO 16484-5)** sobre IP (**BACnet/IP — Anexo J**), a comunicação ocorre via pacotes **UDP** na porta padrão **`47808` (`0xBAC0`)**:
 
-* **Arduino Opta WiFi (Servidor BACnet/IP / Controlador de Campo)**:
+* **Finder OPTA WiFi (Servidor BACnet/IP / Controlador de Campo)**:
   Hospeda o modelo de dados BACnet (`Device`, `Binary Output`, `Binary Input`, `Analog Input`, `Analog Value`, `Schedule`), atualiza os valores presentes (`Present_Value`) a partir das entradas físicas (`I1–I8` e botão `BTN_USER`), aciona os relés físicos (`D0–D3`) e responde às requisições da rede.
 * **YABE — Yet Another BACnet Explorer (Cliente BACnet/IP / Estação de Engenharia)**:
   Simula o papel de um sistema supervisório predial (**BMS / SCADA**). Realiza a descoberta automática de dispositivos na rede (`Who-Is` / `I-Am`), lê a lista de objetos e suas propriedades (`ReadProperty` / `ReadPropertyMultiple`), envia comandos de escrita (`WriteProperty`) respeitando a tabela de prioridades (`Priority_Array`) e assina notificações de mudança de valor (`SubscribeCOV`).
@@ -32,7 +32,7 @@ flowchart LR
         YABE["YABE (Cliente BACnet/IP)\nUDP :47808 (0xBAC0)"]
     end
 
-    subgraph OPTA["Arduino Opta WiFi (Servidor BACnet/IP - IP: 192.168.0.150)"]
+    subgraph OPTA["Finder OPTA WiFi (Servidor BACnet/IP - IP: 192.168.0.150)"]
         ETH["Interface Ethernet RJ45\nBIP_Peripheral (UDP :47808)"]
         STACK["Pilha BACnet-Arduino\nDEVICE:2001 (Opta_WiFi_BACnet)"]
         IO["Hardware Físico\nRelés D0..D3 | LEDs\nBTN_USER | Entradas I1..I8"]
@@ -48,7 +48,7 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     participant YABE as YABE (Cliente no PC)
-    participant OPTA as Arduino Opta (Servidor DEVICE:2001)
+    participant OPTA as Finder OPTA (Servidor DEVICE:2001)
 
     YABE->>OPTA: Broadcast UDP (Who-Is)
     OPTA-->>YABE: Broadcast UDP (I-Am Device 2001, IP: 192.168.0.150:47808)
@@ -63,7 +63,7 @@ sequenceDiagram
 
 ## 2. Bibliotecas Utilizadas e Alterações Realizadas
 
-Para compilar o projeto para a placa **Arduino Opta** (pacote **`Arduino Mbed OS Opta Boards` — `arduino:mbed_opta:opta` v`4.6.0`**), são utilizadas as seguintes bibliotecas:
+Para compilar o projeto para a placa **Finder OPTA** (pacote **`Arduino Mbed OS Opta Boards` — `arduino:mbed_opta:opta` v`4.6.0`**), são utilizadas as seguintes bibliotecas:
 
 | Biblioteca | Versão | Papel no Projeto |
 | :--- | :--- | :--- |
@@ -90,7 +90,7 @@ error: 'tmElements_t' does not name a type
 
 ### 2.2. Problema 2 Encontrado e Alteração Realizada em `WeeklyAlarm 5.2.0` (`src/WeeklyAlarm.h`)
 
-Mesmo utilizando a `WeeklyAlarm 5.2.0` original no **Arduino Opta**, ocorria uma falha crítica no sistema de build da **Arduino IDE / `arduino-cli`**:
+Mesmo utilizando a `WeeklyAlarm 5.2.0` original no **Finder OPTA**, ocorria uma falha crítica no sistema de build da **Arduino IDE / `arduino-cli`**:
 
 #### Diagnóstico Técnico da Causa Raiz
 1. Durante a etapa inicial de **descoberta de bibliotecas** (*Library Discovery Phase*), o `arduino-cli` / Arduino IDE invoca o pré-processador `arm-none-eabi-g++` passando a flag `-DARDUINO_LIBRARY_DISCOVERY_PHASE=1` (definida em `platform.txt` do core `arduino:mbed_opta`).
@@ -169,7 +169,7 @@ Para operar em **BACnet/IP (Ethernet)**, o arquivo `arduino_configs.h` deve esta
 
 ## 4. Mapeamento de Hardware e Objetos BACnet
 
-O firmware `Opta_BACnetIP_Test/Opta_BACnetIP_Test.ino` configura o Arduino Opta WiFi como o dispositivo **`Opta_WiFi_BACnet` (`DEVICE:2001`)** e expõe **16 objetos BACnet**:
+O firmware `Opta_BACnetIP_Test/Opta_BACnetIP_Test.ino` configura o Finder OPTA WiFi como o dispositivo **`Opta_WiFi_BACnet` (`DEVICE:2001`)** e expõe **16 objetos BACnet**:
 
 | Tipo de Objeto BACnet | Instância | `Object_Name` | Pino / Recurso no Opta | Direção / Comportamento |
 | :--- | :---: | :--- | :--- | :--- |
@@ -238,11 +238,11 @@ No `loop()`, três tarefas mantêm o servidor responsivo:
 ## 6. Guia Passo a Passo de Teste no YABE
 
 ### Passo 1: Preparar a Rede entre o PC e o Opta
-1. Conecte um cabo de rede RJ45 entre o **Arduino Opta** e o seu **PC** (ou ao mesmo switch/roteador).
+1. Conecte um cabo de rede RJ45 entre o **Finder OPTA** e o seu **PC** (ou ao mesmo switch/roteador).
 2. Caso esteja usando `USE_DHCP 0` (`192.168.0.150`), certifique-se de que a placa de rede Ethernet do Windows esteja na mesma faixa (ex.: IP `192.168.0.100`, máscara `255.255.255.0`).
 3. Grave o sketch `Opta_BACnetIP_Test.ino` no Opta e abra o Monitor Serial (`115200` baud) para confirmar:
    ```text
-   === Arduino Opta WiFi - Teste BACnet/IP ===
+   === Finder OPTA WiFi - Teste BACnet/IP ===
    [Net] Iniciando Ethernet com IP estatico...
    [Net] IP do Opta: 192.168.0.150
    [Net] Porta UDP BACnet/IP: 47808
@@ -271,7 +271,7 @@ No `loop()`, três tarefas mantêm o servidor responsivo:
 
 ### Passo 5: Monitorar o Botão (`BTN_USER`), Entradas e Contador em Tempo Real
 1. Arraste **`OBJECT_BINARY_INPUT:0`** (`BTN_USER`) e **`OBJECT_ANALOG_VALUE:0`** (`TEST_COUNTER`) da lista **Objects** para a área central (**Subscriptions, Periodic Polling, Events/Alarms**).
-2. Pressione o botão físico **`BTN_USER`** no Arduino Opta e observe o valor alternar em tempo real entre `BINARY_INACTIVE` e `BINARY_ACTIVE` na tabela e no gráfico do YABE.
+2. Pressione o botão físico **`BTN_USER`** no Finder OPTA e observe o valor alternar em tempo real entre `BINARY_INACTIVE` e `BINARY_ACTIVE` na tabela e no gráfico do YABE.
 
 ---
 

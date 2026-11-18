@@ -1,5 +1,5 @@
 /*
- * Teste de Comunicacao BACnet/IP no Arduino Opta WiFi (Ethernet)
+ * Teste de Comunicacao BACnet/IP no Finder OPTA WiFi (Ethernet)
  *
  * Objetivo:
  *   Expor o Opta como Servidor BACnet/IP (UDP porta 47808 / 0xBAC0) para
@@ -52,10 +52,10 @@ constexpr uint16_t BACNET_UDP_PORT = 47808;  // 0xBAC0
 const deviceInfos_t deviceInfos {
     2001,                                       // Device Instance (unico na rede)
     "Opta_WiFi_BACnet",                         // Object Name
-    "Arduino Opta WiFi BACnet/IP Test Server",  // Description
+    "Finder OPTA WiFi BACnet/IP Test Server",   // Description
     "Bancada",                                  // Location
-    "Arduino",                                  // Vendor Name
-    "Opta WiFi",                                // Model Name
+    "Finder",                                   // Vendor Name
+    "Finder OPTA WiFi",                         // Model Name
     "1.0",                                      // Firmware Revision
     "0.1"                                       // Application Software Version
 };
@@ -67,7 +67,7 @@ const deviceInfos_t deviceInfos {
 constexpr time_t DEFAULT_EPOCH = 1794355200UL;
 
 // -----------------------------------------------------------------------------
-// Mapeamento de Hardware do Arduino Opta
+// Mapeamento de Hardware do Finder OPTA
 // -----------------------------------------------------------------------------
 struct RelayChannel {
     uint32_t instance;
@@ -275,7 +275,7 @@ void setup()
     while (!Serial && (millis() - startMs < 3000)) {
     }
 
-    Serial.println("\n=== Arduino Opta WiFi - Teste BACnet/IP ===");
+    Serial.println("\n=== Finder OPTA WiFi - Teste BACnet/IP ===");
     setupHardware();
     setupNetwork();
     setupBacnet();
