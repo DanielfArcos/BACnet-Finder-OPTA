@@ -1,0 +1,17 @@
+WeeklyAlarm	KEYWORD1
+set	KEYWORD2
+add	KEYWORD2
+handler	KEYWORD2
+toggle	KEYWORD2
+dayEnable	KEYWORD2
+dayDisable	KEYWORD2
+dayToggle	KEYWORD2
+alarmOn	KEYWORD2
+alarmOff	KEYWORD2
+alarmToggle	KEYWORD2
+remove	KEYWORD2
+prettyPrintTime	KEYWORD2
+prettyPrintAlarm	KEYWORD2
+isEnable	KEYWORD2
+isDayEnable	KEYWORD2
+toJSON	KEYWORD2
